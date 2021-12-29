@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+
 using namespace std;
 //ascii values for just numbers [48, 57]
 //ascii values for all capitals [65, 90]
@@ -6,8 +8,8 @@ using namespace std;
 const char symbols[10] = {'!','@','#','$','%','^','&','*','?','/'};
 
 bool checkPosInt(string str);
-void makeAllCharPassword(string& password, string length);
-void makeJustLetterPassword(string& password, string length);
+string makePassword(vector<char> characters, int length);
+vector<char> getCharsInRange(int low, int high);
 
 int main() {
     srand (time(NULL)); //random seed
@@ -26,8 +28,11 @@ int main() {
 
         //generate password
         string password;
-        //makeAllCharPassword(password, passwordLength);
-        makeJustLetterPassword(password, passwordLength);
+        vector<char> characters;
+        vector<char> lowercase = getCharsInRange(97,122);
+        characters.insert(characters.end(), lowercase.begin(), lowercase.end());
+        password = makePassword(characters, stoi(passwordLength));
+
 
         cout << "Your password is: " << password << endl;
         cout << "Enter 'q' to quit or press any key to try again: ";
@@ -47,54 +52,48 @@ int main() {
  * @return a boolean of whether or not the string is a positive integer
  */
 bool checkPosInt(string str) {
-    if (str == "" || str[0] == '0')
+    if (str.empty() || str[0] == '0')
         return false;
-    for (int i = 0; i < str.size(); i++) {
-        if (! isdigit(str[i]))
+    for (char i : str) {
+        if (! isdigit(i))
             return false;
     }
     return true;
 }
 
 /**
- * Using all available ASCII (valid) characters, generates a random password of specified length
+ * Given a vector of characters, generates a random sequence of specified length using those characters.
  *
- * @param password the password string to be modified
- * @param length the length of the desired password as a string, but has been checked to be a PosInt
+ * @param characters the possible characters used in the password
+ * @param length password length
+ * @return the password
  */
-void makeAllCharPassword(string& password, string length) {
-    for (int i = 0; i < stoi(length); i++) {
-        //ascii values for all symbols [33, 126] -> 94
-        char newChar = rand() % 94 + 33;
-        password += newChar;
+string makePassword(vector<char> characters, int length) {
+    string password;
+    for (int i = 0; i < length; i++) {
+        int randIdx = rand() % characters.size();
+        password += characters[randIdx];
     }
+    return password;
 }
 
 /**
- * Generates a random password of only capital and lowercase letters of specified length
- *
- * @param password the password string to be modified
- * @param length the length of the desired password as a string, but has been checked to be a PosInt
+ * Get vector of characters in provided range (inclusive)
+ * @param low smallest ASCII character value
+ * @param high highest ASCII character value
+ * @return vector of characters
  */
-void makeJustLetterPassword(string& password, string length) {
-    for (int i = 0; i < stoi(length); i++) {
-        //ascii values for all capitals [65, 90] -> 26
-        //ascii values for all lowercase [97, 122] -> 26
-        char newChar = rand() % (26 + 26);
-
-        //random < 26 means it should be in capitalized range
-        if (newChar < 26)
-            newChar += 65;
-        //otherwise lowercase range
-        else
-            newChar += (97 - 26); //subtract 26 so that random is [0,25] then add back to range
-        password += newChar;
+vector<char> getCharsInRange(int low, int high) {
+    //TODO: check for valid range
+    vector<char> characters;
+    for (int i = low; i <= high; i++) {
+        characters.push_back(i);
     }
+    return characters;
 }
-//use vectors?
-//vector of arrays consisting of possible categories?
-//map of arrays with name of characters?
 
-//TODO: create functions / function objects? for different combos of password types
-//TODO: create extensible way to allow for possible password type expansion in future
+//TODO: create functions / function objects? for different combos of password types that return vector
+//TODO: create extensible way to allow for possible password type expansion in future - custom vector pushback
+//TODO: consider using set instead of vector
 //TODO: optimize UI for entering y/n for what type of password to generate - all at once or step by step
+//TODO: exception throwing
