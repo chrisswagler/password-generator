@@ -10,6 +10,7 @@ const char symbols[10] = {'!','@','#','$','%','^','&','*','?','/'};
 bool checkPosInt(string str);
 string makePassword(vector<char> characters, int length);
 vector<char> getCharsInRange(int low, int high);
+vector<char> getCharsFromUser();
 
 int main() {
     srand (time(NULL)); //random seed
@@ -26,11 +27,41 @@ int main() {
             //loops again if the string is not a positive integer
         } while (!checkPosInt(passwordLength));
 
-        //generate password
+        //get types of characters to include
         string password;
         vector<char> characters;
-        vector<char> lowercase = getCharsInRange(97,122);
-        characters.insert(characters.end(), lowercase.begin(), lowercase.end());
+        do {
+            string types;
+            cout << "Enter types of characters to include:\n"
+                 << "u - uppercase\n"
+                    "l - lowercase\n"
+                    "n - numeric \n"
+                    "c - custom\n";
+            getline(cin, types);
+
+            for (char i: types) {
+                vector<char> toAdd;
+                switch (i) {
+                    case 'u':
+                        toAdd = getCharsInRange(65, 90);
+                        break;
+                    case 'l':
+                        toAdd = getCharsInRange(97, 122);
+                        break;
+                    case 'n':
+                        toAdd = getCharsInRange(48, 57);
+                        break;
+                    case 'c':
+                        toAdd = getCharsFromUser();
+                        break;
+                    default:
+                        //ignore invalid input for now
+                        break;
+                }
+                characters.insert(characters.end(), toAdd.begin(), toAdd.end());
+            }
+        } while (characters.empty());
+
         password = makePassword(characters, stoi(passwordLength));
 
 
@@ -92,8 +123,20 @@ vector<char> getCharsInRange(int low, int high) {
     return characters;
 }
 
-//TODO: create functions / function objects? for different combos of password types that return vector
-//TODO: create extensible way to allow for possible password type expansion in future - custom vector pushback
+/**
+ * Gets vector of characters from user input, regardless of repeat characters.
+ * @return vector of characters
+ */
+vector<char> getCharsFromUser() {
+    vector<char> characters;
+    string input;
+    cout << "Enter characters to add: ";
+    getline(cin, input);
+    for (char i : input) {
+        characters.push_back(i);
+    }
+    return characters;
+}
+
 //TODO: consider using set instead of vector
-//TODO: optimize UI for entering y/n for what type of password to generate - all at once or step by step
 //TODO: exception throwing
