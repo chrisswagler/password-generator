@@ -1,11 +1,11 @@
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 //ascii values for just numbers [48, 57]
 //ascii values for all capitals [65, 90]
 //ascii values for all lowercase [97, 122]
-const char symbols[10] = {'!','@','#','$','%','^','&','*','?','/'};
 
 bool checkPosInt(string str);
 string makePassword(vector<char> characters, int length);
@@ -100,6 +100,8 @@ bool checkPosInt(string str) {
  * @return the password
  */
 string makePassword(vector<char> characters, int length) {
+    if (characters.empty())
+        throw invalid_argument("Cannot make password with empty characters.");
     string password;
     for (int i = 0; i < length; i++) {
         int randIdx = rand() % characters.size();
@@ -114,8 +116,9 @@ string makePassword(vector<char> characters, int length) {
  * @param high highest ASCII character value
  * @return vector of characters
  */
-vector<char> getCharsInRange(int low, int high) {
-    //TODO: check for valid range
+vector<char> getCharsInRange(int low, int high){
+    if (low > high)
+        throw invalid_argument("Invalid provided.");
     vector<char> characters;
     for (int i = low; i <= high; i++) {
         characters.push_back(i);
@@ -139,4 +142,4 @@ vector<char> getCharsFromUser() {
 }
 
 //TODO: consider using set instead of vector
-//TODO: exception throwing
+//TODO: class-based approach with character adding, password creating, etc done internally
